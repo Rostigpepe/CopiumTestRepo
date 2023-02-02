@@ -6,16 +6,17 @@ public class CameraFollow : MonoBehaviour
 {
     [SerializeField] private Transform target;
     [SerializeField] private float smoothSpeed = 0.125f;
-    [SerializeField] private float cameraHeight = 10f;
-
+    [SerializeField] private float cameraHeight = 25f;
+    [SerializeField] private float cameraZOffset = -5f;
+    [SerializeField] private float cameraXOffset = 0f;
 
     private void LateUpdate()
     {
         Vector3 desiredPosition = 
             new Vector3(
-                target.position.x, 
+                target.position.x + cameraXOffset, 
                 target.position.y + cameraHeight, 
-                target.position.z);
+                target.position.z + cameraZOffset);
 
         Vector3 smoothedPosition = 
             Vector3.Lerp(
@@ -25,6 +26,6 @@ public class CameraFollow : MonoBehaviour
 
         transform.SetPositionAndRotation(
             smoothedPosition, 
-            Quaternion.Euler(90f, 0f, 0f));
+            Quaternion.Euler(75f, 0f, 0f));
     }
 }
