@@ -6,40 +6,60 @@ public class SimpleControls : MonoBehaviour
 {
 
     [SerializeField] private float velocity = 10.0f;
-    void PleaseMove()
+    [SerializeField] private Camera cam;
+    [SerializeField] private Rigidbody body;
+    private void PleaseMove()
     {
         if (Input.GetKey(KeyCode.W))
         {
-            gameObject.transform.position += new Vector3(0, 0, 1) * velocity
-                * Time.deltaTime;
+            gameObject.transform.position += 
+                Time.deltaTime * velocity * new Vector3(0, 0, 1);
         }
         if (Input.GetKey(KeyCode.S))
         {
-            gameObject.transform.position += new Vector3(0, 0, 1) * -velocity 
-                * Time.deltaTime;
+            gameObject.transform.position += 
+                Time.deltaTime * -velocity * new Vector3(0, 0, 1);
         }
         if (Input.GetKey(KeyCode.D))
         {
-            gameObject.transform.position += new Vector3(1, 0, 0) * velocity
-                * Time.deltaTime;
+            gameObject.transform.position += 
+                Time.deltaTime * velocity * new Vector3(1, 0, 0);
         }
         if (Input.GetKey(KeyCode.A))
         {
-            gameObject.transform.position += new Vector3(1, 0, 0) * -velocity 
-                * Time.deltaTime;
+            gameObject.transform.position += 
+                Time.deltaTime * -velocity * new Vector3(1, 0, 0);
         }
         
     }
 
-    // Start is called before the first frame update
-    void Start()
+    private void LookAtMouseCyka()
     {
-        
+        Ray ray = cam.ScreenPointToRay(Input.mousePosition);
+        Plane plane = new Plane(Vector3.up, transform.position);
+
+
+        if (plane.Raycast(ray, out float distance))
+        {
+            Vector3 lookPoint = ray.GetPoint(distance);
+            body.rotation = Quaternion.LookRotation(lookPoint - transform.position);
+        }
+    }
+
+    // Start is called before the first frame update
+    private void Start()
+    {
+        body = GetComponent<Rigidbody>();
     }
 
     // Update is called once per frame
-    void Update()
+    private void Update()
     {
         PleaseMove();
+    }
+
+    private void FixedUpdate()
+    {
+        LookAtMouseCyka();
     }
 }
