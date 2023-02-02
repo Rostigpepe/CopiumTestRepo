@@ -10,7 +10,7 @@ public class Actor : MonoBehaviour
 
     private bool IsDead()
     {
-        return health >= 0;
+        return health <= 0;
     }
 
 	private void Die()
@@ -26,5 +26,10 @@ public class Actor : MonoBehaviour
         {
             Die();
         }
+    }
+
+    private void Start()
+    {
+        health = maxHealth;
     }
 }
