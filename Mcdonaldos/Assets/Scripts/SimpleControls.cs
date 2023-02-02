@@ -10,22 +10,22 @@ public class SimpleControls : MonoBehaviour
     {
         if (Input.GetKey(KeyCode.W))
         {
-            gameObject.transform.position = new Vector3(0, 0, 1) * velocity
+            gameObject.transform.position += new Vector3(0, 0, 1) * velocity
                 * Time.deltaTime;
         }
         if (Input.GetKey(KeyCode.S))
         {
-            gameObject.transform.position = new Vector3(0, 0, 1) * -velocity 
-                * Time.deltaTime;
-        }
-        if (Input.GetKey(KeyCode.A))
-        {
-            gameObject.transform.position = new Vector3(1, 0, 0) * velocity
+            gameObject.transform.position += new Vector3(0, 0, 1) * -velocity 
                 * Time.deltaTime;
         }
         if (Input.GetKey(KeyCode.D))
         {
-            gameObject.transform.position = new Vector3(1, 0, 0) * -velocity 
+            gameObject.transform.position += new Vector3(1, 0, 0) * velocity
+                * Time.deltaTime;
+        }
+        if (Input.GetKey(KeyCode.A))
+        {
+            gameObject.transform.position += new Vector3(1, 0, 0) * -velocity 
                 * Time.deltaTime;
         }
         
