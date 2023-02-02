@@ -11,9 +11,10 @@ public class PriorityQueue <T>
 	// Returns the amount of elements stored in the heap
 	public int Size { get => heap.Count; }
 	public T Top { get => heap[0].Item2; }
+	public bool IsEmpty { get => Size == 0; }
 
 	// Constructor empty
-	PriorityQueue()
+	public PriorityQueue()
 	{
 		heap = new List<(double, T)>();
 	}
@@ -91,13 +92,13 @@ public class PriorityQueue <T>
 	}
 
 	// Remove and return maximum value
-	public T Removemax()
+	public T RemoveMax()
 	{
-		Swap(0, Size); // Swap maximum with last value
+		T temp = Top;
+		Swap(0, Size - 1); // Swap maximum with last value
+		heap.RemoveAt(Size - 1);
 		if (Size != 0)      // Not on last element
 			Siftdown(0);   // Put new heap root val in correct place
-		(double, T) temp = heap[Size - 1];
-		heap.RemoveAt(Size - 1);
-		return temp.Item2;
+		return temp;
 	}
 }
