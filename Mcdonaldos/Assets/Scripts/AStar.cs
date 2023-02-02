@@ -127,17 +127,23 @@ public class AStar <T>
 		List<AStarNode> closed = new List<AStarNode>();
 
 		AStarNode startNode = new AStarNode(0, 0, startX, startY);
+		open.Insert(0, startNode);
+
+		List<T> lookedAt = new List<T>();
 
 		while (!open.IsEmpty)
 		{
 			AStarNode current = open.RemoveMax();
+			lookedAt.Add(objectMap[current.XIndex, current.YIndex]);
 
 			AStarNode[] neighbours = GetNeighbours(current, weightMap);
+			//Debug.Log($"open: {open.Size}, Neighbours: {neighbours.Length}");
 
 			foreach (AStarNode neighbour in neighbours)
 			{
 				if(neighbour.XIndex == goalX && neighbour.YIndex == goalY)
 				{
+					return lookedAt.ToArray();
 					return BacktracePath(neighbour, objectMap);
 				}
 
@@ -148,22 +154,38 @@ public class AStar <T>
 
 				for (int i = 0; i < closed.Count; i++)
 				{
-					if (neighbour.Equals(closed[i]))
+					if (closed[i].XIndex == neighbour.XIndex && closed[i].YIndex == neighbour.YIndex)
 					{
 						dupIndex = i;
+						Debug.Log("Earth is flat");
 						break;
 					}
 				}
 
-				if(dupIndex != -1 && closed[dupIndex].FCost < neighbour.FCost)
+				if(dupIndex != -1)
 				{
+					Debug.Log("AHHHH");
 					continue;
+					if (closed[dupIndex].FCost > neighbour.FCost)
+					{
+						closed[dupIndex] = neighbour;
+						Debug.Log("we gaming");
+					}
+					else
+					{
+						continue;
+					}
 				}
-
-				open.Insert(neighbour.FCost, neighbour);
+				else
+				{
+					open.Insert(neighbour.FCost, neighbour);
+				}
 			}
+
+			closed.Add(current);
 		}
 
+		return lookedAt.ToArray();
 		return new T[0];
 	}
 }

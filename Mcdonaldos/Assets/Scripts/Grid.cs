@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using Unity.VisualScripting;
 using UnityEngine;
 
@@ -46,6 +47,7 @@ public class Grid : MonoBehaviour
 	[SerializeField] private float cellRadius;
 
 	private Cell[,] grid;
+	private float[,] weightMap;
 	private float cellDiameter;
 	private int gridSizeX, gridSizeY;
 
@@ -55,7 +57,8 @@ public class Grid : MonoBehaviour
 		gridSizeX = Mathf.RoundToInt(gridWorldSize.x / cellDiameter);
 		gridSizeY = Mathf.RoundToInt(gridWorldSize.y / cellDiameter);
 
-		grid = new Cell[gridSizeY, gridSizeX];
+		grid = new Cell[gridSizeX, gridSizeY];
+		weightMap = new float[gridSizeX, gridSizeY];
 		Vector3 worldBottomLeft = transform.position - Vector3.right * gridWorldSize.x / 2 - Vector3.forward * gridWorldSize.y / 2;
 
 		for (int y = 0; y < gridSizeY; y++)
@@ -64,7 +67,15 @@ public class Grid : MonoBehaviour
 			{
 				Vector3 worldPoint = worldBottomLeft + Vector3.right * (x * cellDiameter + cellRadius) + Vector3.forward * (y * cellDiameter + cellRadius);
 				bool walkable = !(Physics.CheckSphere(worldPoint, cellRadius, unwalkableMask));
-				grid[y, x] = new Cell(worldPoint, walkable, x, y);
+				grid[x, y] = new Cell(worldPoint, walkable, x, y);
+				if (walkable)
+				{
+					weightMap[x, y] = 1;
+				}
+				else
+				{
+					weightMap[x, y] = -1;
+				}
 			}
 		}
 	}
@@ -78,7 +89,7 @@ public class Grid : MonoBehaviour
 
 		int x = Mathf.RoundToInt((gridSizeX - 1) * percentX);
 		int y = Mathf.RoundToInt((gridSizeY - 1) * percentY);
-		return grid[y, x];
+		return grid[x, y];
 	}
 
 	private void Start()
@@ -92,11 +103,54 @@ public class Grid : MonoBehaviour
 
 		if (grid != null)
 		{
-			foreach (Cell cell in grid)
+			/*foreach (Cell cell in grid)
 			{
 				Gizmos.color = (cell.Walkable) ? Color.white : Color.red;
+
 				Gizmos.DrawCube(cell.WorldPos, Vector3.one * (cellDiameter - 0.1f));
+			}*/
+
+			Cell fromCell = GetCellFromWorldPoint(from.position);
+			Cell toCell = GetCellFromWorldPoint(to.position);
+			if (path != null)
+			{
+				foreach (Cell cell in path)
+				{
+					/*Gizmos.color = (cell.Walkable) ? Color.white : Color.red;
+					if(cell == fromCell)
+					{
+						Gizmos.color = Color.blue;
+					}
+					if (cell == toCell)
+					{
+						Gizmos.color = Color.green;
+					}
+					if (path != null && path.Contains(cell))
+					{
+						Gizmos.color = Color.black;
+						Gizmos.DrawCube(cell.WorldPos, Vector3.one * (cellDiameter - 0.1f));
+					}*/
+
+					Gizmos.color = Color.black;
+					Gizmos.DrawCube(cell.WorldPos, Vector3.one * (cellDiameter - 0.1f));
+				}
 			}
+		}
+	}
+
+	public bool pathFindOnce = false;
+	public bool pathFind = false;
+	public bool showVisited = false;
+	private void Update()
+	{
+		if (pathFindOnce || pathFind)
+		{
+			pathFindOnce = false;
+			Cell fromCell = GetCellFromWorldPoint(from.position);
+			Cell toCell = GetCellFromWorldPoint(to.position);
+
+			path = AStar<Cell>.PathFind(grid, weightMap, fromCell.GridX, fromCell.GridY, toCell.GridX, toCell.GridY);
+			//UnityEngine.Debug.Log(path.Length);
 		}
 	}
 }
