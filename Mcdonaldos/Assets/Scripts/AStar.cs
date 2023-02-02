@@ -1,9 +1,11 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class AStarNode
 {
+	public bool visited = false;
 	public float GCost;
 	public float HCost;
 	public float FCost;
@@ -127,65 +129,53 @@ public class AStar <T>
 		List<AStarNode> closed = new List<AStarNode>();
 
 		AStarNode startNode = new AStarNode(0, 0, startX, startY);
+		startNode.visited = true;
+		closed.Add(startNode);
 		open.Insert(0, startNode);
 
-		List<T> lookedAt = new List<T>();
-
-		while (!open.IsEmpty)
+		while(!open.IsEmpty)
 		{
 			AStarNode current = open.RemoveMax();
-			lookedAt.Add(objectMap[current.XIndex, current.YIndex]);
 
-			AStarNode[] neighbours = GetNeighbours(current, weightMap);
-			//Debug.Log($"open: {open.Size}, Neighbours: {neighbours.Length}");
-
-			foreach (AStarNode neighbour in neighbours)
+			if(current.XIndex == goalX && current.YIndex == goalY)
 			{
-				if(neighbour.XIndex == goalX && neighbour.YIndex == goalY)
-				{
-					return lookedAt.ToArray();
-					return BacktracePath(neighbour, objectMap);
-				}
+				return BacktracePath(current, objectMap);
+			}
 
-				neighbour.HCost = Vector2.Distance(new Vector2(goalX, goalY), new Vector2(neighbour.XIndex, neighbour.YIndex));
-				neighbour.FCost = neighbour.HCost + neighbour.GCost;
+			foreach (AStarNode neighbour in GetNeighbours(current, weightMap))
+			{
+				neighbour.HCost = Vector2.Distance(new Vector2(neighbour.XIndex, neighbour.YIndex), new Vector2(goalX, goalY));
+				neighbour.FCost = neighbour.GCost + neighbour.HCost;
 
-				int dupIndex = -1;
+				int dupeIndex = -1;
 
 				for (int i = 0; i < closed.Count; i++)
 				{
-					if (closed[i].XIndex == neighbour.XIndex && closed[i].YIndex == neighbour.YIndex)
+					if (closed[i].Equals(neighbour))
 					{
-						dupIndex = i;
-						Debug.Log("Earth is flat");
+						dupeIndex = i;
 						break;
 					}
 				}
 
-				if(dupIndex != -1)
+				if(dupeIndex != -1 && closed[dupeIndex].FCost <= neighbour.FCost)
 				{
-					Debug.Log("AHHHH");
 					continue;
-					if (closed[dupIndex].FCost > neighbour.FCost)
-					{
-						closed[dupIndex] = neighbour;
-						Debug.Log("we gaming");
-					}
-					else
-					{
-						continue;
-					}
+				}
+
+				if(dupeIndex == -1)
+				{
+					closed.Add(neighbour);
 				}
 				else
 				{
-					open.Insert(neighbour.FCost, neighbour);
+					closed[dupeIndex] = neighbour;
 				}
-			}
 
-			closed.Add(current);
+				open.Insert(neighbour.FCost, neighbour);
+			}
 		}
 
-		return lookedAt.ToArray();
 		return new T[0];
 	}
 }
