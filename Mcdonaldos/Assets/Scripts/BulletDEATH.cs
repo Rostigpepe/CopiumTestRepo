@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class BulletDEATH : MonoBehaviour
@@ -18,10 +17,10 @@ public class BulletDEATH : MonoBehaviour
         if (actor)
         {
             collision.gameObject.GetComponent<Actor>().TakeDamange(5);
-            StopAllCoroutines();
-            Destroy(gameObject);StopAllCoroutines();
-            Destroy(gameObject);
         }
+
+        StopAllCoroutines();
+        Destroy(gameObject);
         //Instant death
         //Destroy(collision.gameObject);
     }
