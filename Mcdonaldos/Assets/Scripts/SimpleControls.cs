@@ -36,21 +36,16 @@ public class SimpleControls : MonoBehaviour
     private void LookAtMouseCyka()
     {
         Ray ray = cam.ScreenPointToRay(Input.mousePosition);
-        Plane plane = new Plane(Vector3.up, transform.position);
+        Plane plane = new(Vector3.up, transform.position);
 
 
         if (plane.Raycast(ray, out float distance))
         {
             Vector3 lookPoint = ray.GetPoint(distance);
-            body.rotation = Quaternion.LookRotation(lookPoint - transform.position);
+            transform.rotation = Quaternion.LookRotation(lookPoint - transform.position);
         }
     }
 
-    // Start is called before the first frame update
-    private void Start()
-    {
-        body = GetComponent<Rigidbody>();
-    }
 
     // Update is called once per frame
     private void Update()
